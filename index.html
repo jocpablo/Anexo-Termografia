@@ -2,7 +2,9 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Informe Termográfico - Layout con Sidebar + Switches + Guardar/Cargar Archivo (JSON)</title>
+  <!-- Meta viewport para responsividad en dispositivos móviles -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Informe Termográfico - Responsive (4K, Full HD y Smartphones)</title>
   <style>
     :root {
       --theme-color: #c00000; /* Color rojo principal */
@@ -28,8 +30,7 @@
       overflow: hidden;
     }
     
-    /* ===== MENÚ LATERAL (SIDEBAR) MEJORADO ===== */
-    /* Se oculta en impresión usando la clase "no-print" */
+    /* ===== SIDEBAR ===== */
     #sidebar.no-print {
       width: 280px;
       min-width: 240px;
@@ -59,13 +60,12 @@
       display: flex; 
       align-items: center;
     }
-    /* Etiqueta para el switch */
     .switch-label {
       font-size: 0.95em;
       color: #555;
       user-select: none;
     }
-    /* ===== ESTILOS PARA LOS SWITCHES ===== */
+    /* ===== SWITCHES ===== */
     .switch {
       position: relative;
       display: inline-block;
@@ -137,7 +137,7 @@
       transform: scale(1.03);
     }
     
-    /* ===== ÁREA PRINCIPAL (REPORTE) ===== */
+    /* ===== ÁREA DE REPORTE ===== */
     .report-container {
       flex: 1;
       margin: 20px;
@@ -152,12 +152,9 @@
       box-sizing: border-box;
     }
     
-    /* ===== REGLA PARA IMPRESIÓN ===== */
+    /* ===== IMPRESIÓN ===== */
     @media print {
-      /* Oculta todos los elementos con la clase "no-print" */
-      .no-print {
-        display: none !important;
-      }
+      .no-print { display: none !important; }
       .report-container {
         margin: 0 !important;
         border: none !important;
@@ -166,7 +163,7 @@
       }
     }
     
-    /* ===== ESTILOS DEL REPORTE (Parecidos a Anexo.html) ===== */
+    /* ===== TABLAS ===== */
     .summary-table-title {
       background: var(--theme-color);
       color: #fff;
@@ -203,9 +200,7 @@
       font-weight: bold;
       width: 40px;
     }
-    .compCell,
-    .estCell,
-    .critCell {
+    .compCell, .estCell, .critCell {
       border: 1px solid #ccc !important;
     }
     .critCell {
@@ -214,12 +209,11 @@
       width: 100px;
     }
     
-    /* Secciones Termográficas */
+    /* ===== SECCIONES TERMOGRÁFICAS ===== */
     .termografia-section-wrapper {
       margin-bottom: 30px;
       transition: opacity 0.4s;
     }
-    /* Botón "Eliminar Sección" -> se oculta en impresión (no-print) */
     .removeSectionBtn {
       background: #900000;
       color: #fff;
@@ -263,7 +257,6 @@
       max-height: 100%;
       object-fit: contain;
     }
-    /* Botón "Eliminar Imagen" -> ahora restablece la imagen (no elimina el contenedor) */
     .removeFrameBtn {
       position: absolute;
       top: 5px;
@@ -282,7 +275,6 @@
       background: #900000;
       transform: scale(1.1);
     }
-    /* Botón "Agregar Sección" -> "no-print" para que no salga en PDF */
     .addSectionBtn.no-print {
       background: #28a745;
       color: #fff;
@@ -339,7 +331,7 @@
       white-space: pre-line;
     }
     
-    /* PIE DE PÁGINA (Exportar / Guardar) - se oculta en impresión */
+    /* ===== PIE DE PÁGINA ===== */
     .pdf-export-container.no-print {
       text-align: center;
       margin: 20px 0;
@@ -353,9 +345,7 @@
       color: #fff;
       transition: background var(--transition-speed), transform var(--transition-speed);
     }
-    #exportPdfBtn {
-      background: #6c757d;
-    }
+    #exportPdfBtn { background: #6c757d; }
     #exportPdfBtn:hover {
       background: #5a6268;
       transform: scale(1.05);
@@ -367,23 +357,18 @@
       background: #e65100;
       transform: scale(1.05);
     }
-    /* Nuevos botones para guardar/cargar archivo JSON */
-    .btn-saveFile {
-      background: #28a745;
-    }
+    .btn-saveFile { background: #28a745; }
     .btn-saveFile:hover {
       background: #218838;
       transform: scale(1.05);
     }
-    .btn-loadFile {
-      background: #007bff;
-    }
+    .btn-loadFile { background: #007bff; }
     .btn-loadFile:hover {
       background: #0056b3;
       transform: scale(1.05);
     }
     
-    /* LOGOS y MARCA DE AGUA */
+    /* ===== LOGOS y MARCA DE AGUA ===== */
     #logoContainer {
       display: flex;
       justify-content: space-between;
@@ -412,22 +397,52 @@
       z-index: 100;
     }
     
-    /* EDICIÓN (Focus) */
+    /* ===== EDICIÓN ===== */
     [contenteditable="true"]:focus {
       outline: 2px dashed var(--theme-color);
       background: #fef6f6;
     }
+    
+    /* ===== RESPONSIVIDAD ===== */
+    /* Para smartphones */
+    @media (max-width: 768px) {
+      .layout-container {
+        flex-direction: column;
+      }
+      #sidebar.no-print {
+        width: 100%;
+        min-width: unset;
+      }
+      .report-container {
+        margin: 10px;
+        padding: 10px;
+      }
+      .summary-table th, .summary-table td,
+      .thermo-table th, .thermo-table td {
+        font-size: 0.8em;
+      }
+    }
+    /* Para pantallas 4K */
+    @media (min-width: 3840px) {
+      .report-container {
+        margin: 40px;
+        padding: 40px;
+      }
+      .summary-table-title {
+        font-size: 1.5em;
+      }
+      .summary-table th, .summary-table td,
+      .thermo-table th, .thermo-table td {
+        font-size: 1.2em;
+      }
+    }
   </style>
 </head>
 <body>
-  <!-- CONTENEDOR FLEX: SIDEBAR + REPORTE -->
   <div class="layout-container">
-    
-    <!-- SIDEBAR: Opciones de Edición (Oculto en impresión con "no-print") -->
+    <!-- SIDEBAR -->
     <div id="sidebar" class="no-print">
       <h2>Opciones de Edición</h2>
-      
-      <!-- Modo edición -->
       <div class="option-group">
         <label class="switch">
           <input type="checkbox" id="editModeCheckbox" checked onchange="toggleEditingMode(this)">
@@ -435,8 +450,6 @@
         </label>
         <span class="switch-label">Activar modo edición</span>
       </div>
-      
-      <!-- Edición avanzada -->
       <div class="option-group">
         <label class="switch">
           <input type="checkbox" id="advancedEditCheckbox" onchange="toggleAdvancedEditing(this)">
@@ -444,8 +457,6 @@
         </label>
         <span class="switch-label">Edición avanzada</span>
       </div>
-      
-      <!-- Redondear elementos rojos -->
       <div class="option-group">
         <label class="switch">
           <input type="checkbox" id="roundingCheckbox" onchange="toggleRounding(this)">
@@ -453,8 +464,6 @@
         </label>
         <span class="switch-label">Redondear elementos rojos</span>
       </div>
-      
-      <!-- Temas Encabezados -->
       <fieldset class="option-group" style="flex-direction: column; align-items: flex-start;">
         <legend>Temas Encabezados</legend>
         <label>Fuente:
@@ -477,8 +486,6 @@
         </label>
         <button class="btn-primary" onclick="applyHeadingTheme()">Aplicar Encabezados</button>
       </fieldset>
-      
-      <!-- Temas Generales -->
       <fieldset class="option-group" style="flex-direction: column; align-items: flex-start;">
         <legend>Temas Generales</legend>
         <label>Fuente:
@@ -500,8 +507,6 @@
         </label>
         <button class="btn-primary" onclick="applyGeneralTheme()">Aplicar Tema General</button>
       </fieldset>
-      
-      <!-- Logos -->
       <fieldset class="option-group" style="flex-direction: column; align-items: flex-start;">
         <legend>Logos</legend>
         <label>Logo Izquierdo:
@@ -514,8 +519,6 @@
         </label>
         <button class="btn-danger" onclick="removeLogo('right')">Eliminar Logo Der.</button>
       </fieldset>
-      
-      <!-- Estilos del Reporte -->
       <fieldset class="option-group" style="flex-direction: column; align-items: flex-start;">
         <legend>Estilos del Reporte</legend>
         <label>Margen (px):
@@ -528,8 +531,6 @@
           <input type="number" step="0.1" id="letterSpacingControl" value="0" min="0" max="5">
         </label>
       </fieldset>
-      
-      <!-- Botones de Configuración -->
       <div class="options-buttons">
         <button class="btn-primary" onclick="setDefaults()">Guardar Config. Predeterminada</button>
         <button class="btn-danger" onclick="resetDocument()">Restablecer Reporte</button>
@@ -538,14 +539,11 @@
     
     <!-- REPORTE -->
     <main class="report-container" id="reportContainer">
-      <!-- Logos y Marca de Agua -->
       <div id="logoContainer">
         <img id="logoLeft" alt="Logo Izquierdo" />
         <img id="logoRight" alt="Logo Derecho" />
       </div>
       <div id="watermarkOverlay"></div>
-      
-      <!-- Título y Tabla Resumen -->
       <div class="summary-table-title">Resumen de Inspecciones</div>
       <table class="summary-table" id="summaryTable">
         <thead>
@@ -560,19 +558,15 @@
           <!-- Se actualiza automáticamente -->
         </tbody>
       </table>
-      
-      <!-- Secciones Termográficas -->
       <div id="sectionsContainer"></div>
-      <!-- Botón para agregar secciones => clase no-print para ocultar en PDF -->
       <button class="addSectionBtn no-print" id="addTermografiaSectionBtn">➕ Agregar Sección de Termografía</button>
     </main>
   </div>
   
-  <!-- PIE DE PÁGINA (Exportar / Guardar) - no-print para ocultarlo al imprimir -->
+  <!-- PIE DE PÁGINA -->
   <div class="pdf-export-container no-print">
     <button id="exportPdfBtn" class="btn btn-primary">🖨 Imprimir/Exportar PDF</button>
     <button id="exportImageBtn" class="btn btn-primary">Exportar a Imagen</button>
-    <!-- NUEVOS BOTONES: GUARDAR/CARGAR ARCHIVO JSON -->
     <button id="saveFileBtn" class="btn btn-saveFile">💾 Guardar en Archivo</button>
     <button id="loadFileBtn" class="btn btn-loadFile">📂 Cargar desde Archivo</button>
   </div>
@@ -580,529 +574,496 @@
   <!-- Librería html2canvas -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script>
-  /************************************************************
-   * Función para actualizar el estilo de una celda de criticidad
-   * según su valor (B: verde, A: amarillo, C: rojo).
-   * Se aplica tanto a la celda de la tabla resumen como a la de la sección.
-   ************************************************************/
-  function updateCriticidadStyle(element) {
-    const value = element.textContent.trim().toUpperCase();
-    if(value === 'B'){
-      element.style.backgroundColor = "green";
-      element.style.color = "green";
-    } else if(value === 'A'){
-      element.style.backgroundColor = "yellow";
-      element.style.color = "yellow";
-    } else if(value === 'C'){
-      element.style.backgroundColor = "red";
-      element.style.color = "red";
-    } else {
-      element.style.backgroundColor = "";
-      element.style.color = "";
+    /************************************************************
+     * Función debounce para actualizar la tabla resumen tras 300ms
+     ************************************************************/
+    let debounceTimeout;
+    function debounceUpdateSummaryTable() {
+      clearTimeout(debounceTimeout);
+      debounceTimeout = setTimeout(() => { updateSummaryTable(); }, 300);
     }
-  }
-  
-  /************************************************************
-   * 1) Función para crear un contenedor .image-box
-   *    con doble clic para adjuntar imagen y pegar desde portapapeles.
-   *    El botón “🗑” restablece la imagen al placeholder sin eliminar el contenedor.
-   ************************************************************/
-  function createImageBox(placeholderText) {
-    const div = document.createElement("div");
-    div.classList.add("image-box");
-    div.setAttribute("tabindex", "0");
     
-    const placeholderURL = "https://via.placeholder.com/400x300?text=" + encodeURIComponent(placeholderText);
-
-    // Imagen placeholder
-    const img = document.createElement("img");
-    img.classList.add("preview-image");
-    img.src = placeholderURL;
-    img.alt = placeholderText;
-    
-    // Botón para restablecer la imagen (no se elimina el recuadro)
-    const removeBtn = document.createElement("button");
-    removeBtn.classList.add("removeFrameBtn", "no-print");
-    removeBtn.title = "Eliminar imagen";
-    removeBtn.textContent = "🗑";
-    removeBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      // Restablece la imagen al placeholder original
-      img.src = placeholderURL;
-    });
-    
-    // Input para seleccionar imagen
-    const fileInput = document.createElement("input");
-    fileInput.type = "file";
-    fileInput.accept = "image/*";
-    fileInput.style.display = "none";
-    fileInput.addEventListener("change", () => {
-      if (fileInput.files && fileInput.files[0]) {
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-          img.src = ev.target.result;
-        };
-        reader.readAsDataURL(fileInput.files[0]);
+    /************************************************************
+     * Actualiza el estilo de una celda de criticidad según su valor
+     ************************************************************/
+    function updateCriticidadStyle(element) {
+      const value = element.textContent.trim().toUpperCase();
+      if (value === 'B') {
+        element.style.backgroundColor = "green";
+        element.style.color = "green";
+      } else if (value === 'A') {
+        element.style.backgroundColor = "yellow";
+        element.style.color = "yellow";
+      } else if (value === 'C') {
+        element.style.backgroundColor = "red";
+        element.style.color = "red";
+      } else {
+        element.style.backgroundColor = "";
+        element.style.color = "";
       }
-    });
+    }
     
-    // Doble clic: abrir selector de archivos
-    div.addEventListener("dblclick", () => fileInput.click());
-    
-    // Pegar imagen desde portapapeles
-    div.addEventListener("paste", (e) => {
-      const items = e.clipboardData.items;
-      for (let i = 0; i < items.length; i++) {
-        if (items[i].type.indexOf("image") === 0) {
-          const file = items[i].getAsFile();
+    /************************************************************
+     * Crea un contenedor .image-box para imágenes
+     ************************************************************/
+    function createImageBox(placeholderText) {
+      const div = document.createElement("div");
+      div.classList.add("image-box");
+      div.setAttribute("tabindex", "0");
+      
+      const placeholderURL = "https://via.placeholder.com/400x300?text=" + encodeURIComponent(placeholderText);
+      const img = document.createElement("img");
+      img.classList.add("preview-image");
+      img.src = placeholderURL;
+      img.alt = placeholderText;
+      
+      const removeBtn = document.createElement("button");
+      removeBtn.classList.add("removeFrameBtn", "no-print");
+      removeBtn.title = "Eliminar imagen";
+      removeBtn.textContent = "🗑";
+      removeBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        img.src = placeholderURL;
+      });
+      
+      const fileInput = document.createElement("input");
+      fileInput.type = "file";
+      fileInput.accept = "image/*";
+      fileInput.style.display = "none";
+      fileInput.addEventListener("change", () => {
+        if (fileInput.files && fileInput.files[0]) {
           const reader = new FileReader();
-          reader.onload = (ev) => {
-            img.src = ev.target.result;
+          reader.onload = (ev) => { img.src = ev.target.result; };
+          reader.readAsDataURL(fileInput.files[0]);
+        }
+      });
+      
+      div.addEventListener("dblclick", () => fileInput.click());
+      div.addEventListener("paste", (e) => {
+        const items = e.clipboardData.items;
+        for (let i = 0; i < items.length; i++) {
+          if (items[i].type.indexOf("image") === 0) {
+            const file = items[i].getAsFile();
+            const reader = new FileReader();
+            reader.onload = (ev) => { img.src = ev.target.result; };
+            reader.readAsDataURL(file);
+            e.preventDefault();
+          }
+        }
+      });
+      
+      div.append(removeBtn, img, fileInput);
+      return div;
+    }
+    
+    /************************************************************
+     * Actualiza la tabla resumen recorriendo las secciones termográficas
+     ************************************************************/
+    function updateSummaryTable() {
+      const summaryTableBody = document.getElementById('summaryTableBody');
+      summaryTableBody.innerHTML = "";
+      const sections = document.querySelectorAll('.termografia-section-wrapper');
+      let counter = 1;
+      sections.forEach(section => {
+        const comp = section.querySelector('.component-field')?.textContent || '';
+        const estado = section.querySelector('.estado-field')?.textContent || '';
+        const criticidad = section.querySelector('.criticidad-field')?.textContent || '';
+        
+        const tr = document.createElement('tr');
+        tr.setAttribute('data-section-id', section.getAttribute('data-section-id'));
+        
+        const tdCounter = document.createElement('td');
+        tdCounter.classList.add('counterCell');
+        tdCounter.textContent = counter++;
+        
+        const tdComp = document.createElement('td');
+        tdComp.classList.add('compCell');
+        tdComp.textContent = comp;
+        
+        const tdEstado = document.createElement('td');
+        tdEstado.classList.add('estCell');
+        tdEstado.textContent = estado;
+        
+        const tdCrit = document.createElement('td');
+        tdCrit.classList.add('critCell');
+        tdCrit.textContent = criticidad;
+        updateCriticidadStyle(tdCrit);
+        
+        tr.append(tdCounter, tdComp, tdEstado, tdCrit);
+        summaryTableBody.appendChild(tr);
+      });
+    }
+    
+    /************************************************************
+     * Crea una nueva sección termográfica
+     ************************************************************/
+    let sectionCounter = 0;
+    document.getElementById("addTermografiaSectionBtn").addEventListener("click", () => {
+      createTermografiaSection();
+    });
+    function createTermografiaSection() {
+      sectionCounter++;
+      const secId = "sec_" + sectionCounter;
+      
+      const wrapper = document.createElement("div");
+      wrapper.classList.add("termografia-section-wrapper");
+      wrapper.style.opacity = "0";
+      wrapper.setAttribute("data-section-id", secId);
+      
+      const removeBtn = document.createElement("button");
+      removeBtn.classList.add("removeSectionBtn", "no-print");
+      removeBtn.textContent = "🗑 Eliminar Sección";
+      removeBtn.addEventListener("click", () => {
+        if (confirm("¿Eliminar esta sección?")) {
+          wrapper.style.opacity = "0";
+          setTimeout(() => {
+            wrapper.remove();
+            debounceUpdateSummaryTable();
+          }, 400);
+        }
+      });
+      
+      const secTitle = document.createElement("h3");
+      secTitle.style.background = "var(--theme-color)";
+      secTitle.style.color = "#fff";
+      secTitle.style.padding = "8px";
+      secTitle.style.borderRadius = "4px";
+      secTitle.style.fontSize = "1.1em";
+      secTitle.textContent = `Sección Termográfica #${sectionCounter}`;
+      
+      const imageGrid = document.createElement("div");
+      imageGrid.classList.add("image-grid");
+      const box1 = createImageBox("Imagen Térmica");
+      const box2 = createImageBox("Imagen Visual");
+      imageGrid.append(box1, box2);
+      
+      const thermoTable = document.createElement("table");
+      thermoTable.classList.add("thermo-table");
+      thermoTable.innerHTML = `
+        <tbody>
+          <tr>
+            <th colspan="6" class="table-section-title">Datos Generales</th>
+          </tr>
+          <tr>
+            <th>No. de imagen IR</th>
+            <td data-editable="true">IR_00541</td>
+            <th>No. Imagen Visual</th>
+            <td data-editable="true">20221004_113125</td>
+            <th>Humedad Rel.</th>
+            <td data-editable="true">50%</td>
+          </tr>
+          <tr>
+            <th>Distancia</th>
+            <td data-editable="true">0.50m</td>
+            <th>Veloc. Viento</th>
+            <td data-editable="true">N/A</td>
+            <th>Amperaje</th>
+            <td data-editable="true">24</td>
+          </tr>
+          <tr>
+            <th colspan="6" class="table-section-title">Medición</th>
+          </tr>
+          <tr>
+            <th>Temp. Máx.</th>
+            <td data-editable="true">115.08 °C (239.15°F)</td>
+            <th>Temp. Ref.</th>
+            <td data-editable="true">N/A</td>
+            <th>ΔT=</th>
+            <td data-editable="true">N/A</td>
+          </tr>
+          <tr>
+            <th>Emisividad</th>
+            <td data-editable="true">0.95</td>
+            <td colspan="4"></td>
+          </tr>
+          <tr>
+            <th>Componente</th>
+            <td class="component-field" data-editable="true">Equipo XYZ</td>
+            <th>Estado</th>
+            <td class="estado-field" data-editable="true">Operativo</td>
+            <th>Criticidad</th>
+            <td class="criticidad-field" data-editable="true">A</td>
+          </tr>
+        </tbody>
+      `;
+      
+      const condLabel = document.createElement("div");
+      condLabel.classList.add("condicion-label");
+      condLabel.textContent = "Condición";
+      const condText = document.createElement("div");
+      condText.classList.add("condicion-text");
+      condText.setAttribute("data-editable", "true");
+      condText.textContent = "Se detecta anomalía térmica...";
+      
+      wrapper.append(removeBtn, secTitle, imageGrid, thermoTable, condLabel, condText);
+      document.getElementById("sectionsContainer").appendChild(wrapper);
+      
+      setTimeout(() => { wrapper.style.opacity = "1"; }, 50);
+      
+      const componentField = wrapper.querySelector('.component-field');
+      const estadoField = wrapper.querySelector('.estado-field');
+      const criticidadField = wrapper.querySelector('.criticidad-field');
+      if (componentField) componentField.addEventListener("input", debounceUpdateSummaryTable);
+      if (estadoField) estadoField.addEventListener("input", debounceUpdateSummaryTable);
+      if (criticidadField) {
+        criticidadField.addEventListener("input", () => {
+          updateCriticidadStyle(criticidadField);
+          debounceUpdateSummaryTable();
+        });
+        updateCriticidadStyle(criticidadField);
+      }
+      
+      // Verificar el modo edición y asignar contentEditable si es necesario
+      if (document.getElementById("editModeCheckbox").checked) {
+        wrapper.querySelectorAll('[data-editable="true"]').forEach(el => {
+          el.contentEditable = true;
+        });
+      }
+      
+      debounceUpdateSummaryTable();
+    }
+    
+    /************************************************************
+     * Modo edición y edición avanzada
+     ************************************************************/
+    function toggleEditingMode(checkbox) {
+      const isEditing = checkbox.checked;
+      document.querySelectorAll('[data-editable="true"]').forEach(el => {
+        el.contentEditable = isEditing;
+      });
+    }
+    function toggleAdvancedEditing(checkbox) {
+      const advanced = checkbox.checked;
+      document.querySelectorAll('.summary-table th, .table-section-title').forEach(el => {
+        el.contentEditable = advanced;
+        el.style.border = advanced ? "1px dashed #000" : "";
+      });
+    }
+    function toggleRounding(checkbox) {
+      const rounding = checkbox.checked;
+      document.querySelectorAll('.summary-table th, .table-section-title, .removeSectionBtn').forEach(el => {
+        el.style.borderRadius = rounding ? "10px" : "0";
+      });
+    }
+    
+    /************************************************************
+     * Temas Encabezado y Generales
+     ************************************************************/
+    function applyHeadingTheme() {
+      const font = document.getElementById('headingFontSelect').value;
+      const fontSize = document.getElementById('headingFontSize').value;
+      const color = document.getElementById('headingColorPicker').value;
+      const scope = document.querySelector('input[name="headingScope"]:checked').value;
+      if (scope === "todo") {
+        document.querySelectorAll('.summary-table th, .table-section-title, .removeSectionBtn').forEach(el => {
+          el.style.fontFamily = font;
+          el.style.fontSize = fontSize + "px";
+          el.style.color = color;
+        });
+      } else {
+        const selection = window.getSelection();
+        if (selection.rangeCount > 0) {
+          const range = selection.getRangeAt(0);
+          const span = document.createElement('span');
+          span.style.fontFamily = font;
+          span.style.fontSize = fontSize + "px";
+          span.style.color = color;
+          range.surroundContents(span);
+        }
+      }
+    }
+    function applyGeneralTheme() {
+      const generalFont = document.getElementById('generalFontSelect').value;
+      const generalFontSize = document.getElementById('generalFontSize').value;
+      const generalColor = document.getElementById('generalColorPicker').value;
+      const bgColor = document.getElementById('bgColorPicker').value;
+      document.body.style.fontFamily = generalFont;
+      document.body.style.fontSize = generalFontSize + 'px';
+      document.body.style.color = generalColor;
+      document.body.style.backgroundColor = bgColor;
+    }
+    
+    /************************************************************
+     * Logos: Cargar y Eliminar
+     ************************************************************/
+    document.addEventListener('DOMContentLoaded', function() {
+      const leftLogoInput = document.getElementById('leftLogoInput');
+      const rightLogoInput = document.getElementById('rightLogoInput');
+      leftLogoInput.addEventListener('change', e => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = evt => {
+            const img = document.getElementById('logoLeft');
+            img.src = evt.target.result;
+            img.style.display = 'block';
           };
           reader.readAsDataURL(file);
-          e.preventDefault();
         }
-      }
-    });
-    
-    div.append(removeBtn, img, fileInput);
-    return div;
-  }
-  
-  /************************************************************
-   * 2) Función para actualizar la tabla resumen
-   *    Recorre todas las secciones termográficas y reconstruye la tabla.
-   *    Además, actualiza el estilo de la celda de criticidad según su valor.
-   ************************************************************/
-  function updateSummaryTable() {
-    const summaryTableBody = document.getElementById('summaryTableBody');
-    summaryTableBody.innerHTML = ""; // Limpiar contenido previo
-    const sections = document.querySelectorAll('.termografia-section-wrapper');
-    let counter = 1;
-    sections.forEach(section => {
-      const comp = section.querySelector('.component-field')?.textContent || '';
-      const estado = section.querySelector('.estado-field')?.textContent || '';
-      const criticidad = section.querySelector('.criticidad-field')?.textContent || '';
-      
-      const tr = document.createElement('tr');
-      tr.setAttribute('data-section-id', section.getAttribute('data-section-id'));
-      
-      const tdCounter = document.createElement('td');
-      tdCounter.classList.add('counterCell');
-      tdCounter.textContent = counter++;
-      
-      const tdComp = document.createElement('td');
-      tdComp.classList.add('compCell');
-      tdComp.textContent = comp;
-      
-      const tdEstado = document.createElement('td');
-      tdEstado.classList.add('estCell');
-      tdEstado.textContent = estado;
-      
-      const tdCrit = document.createElement('td');
-      tdCrit.classList.add('critCell');
-      tdCrit.textContent = criticidad;
-      // Actualizar estilo de la celda de criticidad en la tabla resumen
-      updateCriticidadStyle(tdCrit);
-      
-      tr.append(tdCounter, tdComp, tdEstado, tdCrit);
-      summaryTableBody.appendChild(tr);
-    });
-  }
-  
-  /************************************************************
-   * 3) Crear Sección Termográfica
-   *    Al finalizar la creación, se actualiza la tabla resumen.
-   *    Además, se agregan event listeners para actualizar la tabla
-   *    cuando se editen los campos "Componente", "Estado" y "Criticidad".
-   *    Se asegura también de que los nuevos elementos sean editables si el modo edición está activo.
-   ************************************************************/
-  let sectionCounter = 0;
-  document.getElementById("addTermografiaSectionBtn").addEventListener("click", () => {
-    createTermografiaSection();
-  });
-  function createTermografiaSection() {
-    sectionCounter++;
-    const secId = "sec_" + sectionCounter;
-    
-    const wrapper = document.createElement("div");
-    wrapper.classList.add("termografia-section-wrapper");
-    wrapper.style.opacity = "0";
-    wrapper.setAttribute("data-section-id", secId);
-    
-    // Botón para eliminar sección => no-print (no se imprime)
-    const removeBtn = document.createElement("button");
-    removeBtn.classList.add("removeSectionBtn", "no-print");
-    removeBtn.textContent = "🗑 Eliminar Sección";
-    removeBtn.addEventListener("click", () => {
-      if (confirm("¿Eliminar esta sección?")) {
-        wrapper.style.opacity = "0";
-        setTimeout(() => {
-          wrapper.remove();
-          updateSummaryTable(); // Actualiza la tabla tras eliminar
-        }, 400);
-      }
-    });
-    
-    // Título de la sección
-    const secTitle = document.createElement("h3");
-    secTitle.style.background = "var(--theme-color)";
-    secTitle.style.color = "#fff";
-    secTitle.style.padding = "8px";
-    secTitle.style.borderRadius = "4px";
-    secTitle.style.fontSize = "1.1em";
-    secTitle.textContent = `Sección Termográfica #${sectionCounter}`;
-    
-    // Grid de imágenes (2 recuadros: Térmica y Visual)
-    const imageGrid = document.createElement("div");
-    imageGrid.classList.add("image-grid");
-    const box1 = createImageBox("Imagen Térmica");
-    const box2 = createImageBox("Imagen Visual");
-    imageGrid.append(box1, box2);
-    
-    // Tabla de Datos de la Sección
-    const thermoTable = document.createElement("table");
-    thermoTable.classList.add("thermo-table");
-    thermoTable.innerHTML = `
-      <tbody>
-        <tr>
-          <th colspan="6" class="table-section-title">Datos Generales</th>
-        </tr>
-        <tr>
-          <th>No. de imagen IR</th>
-          <td data-editable="true">IR_00541</td>
-          <th>No. Imagen Visual</th>
-          <td data-editable="true">20221004_113125</td>
-          <th>Humedad Rel.</th>
-          <td data-editable="true">50%</td>
-        </tr>
-        <tr>
-          <th>Distancia</th>
-          <td data-editable="true">0.50m</td>
-          <th>Veloc. Viento</th>
-          <td data-editable="true">N/A</td>
-          <th>Amperaje</th>
-          <td data-editable="true">24</td>
-        </tr>
-        <tr>
-          <th colspan="6" class="table-section-title">Medición</th>
-        </tr>
-        <tr>
-          <th>Temp. Máx.</th>
-          <td data-editable="true">115.08 °C (239.15°F)</td>
-          <th>Temp. Ref.</th>
-          <td data-editable="true">N/A</td>
-          <th>ΔT=</th>
-          <td data-editable="true">N/A</td>
-        </tr>
-        <tr>
-          <th>Emisividad</th>
-          <td data-editable="true">0.95</td>
-          <td colspan="4"></td>
-        </tr>
-        <tr>
-          <th>Componente</th>
-          <td class="component-field" data-editable="true">Equipo XYZ</td>
-          <th>Estado</th>
-          <td class="estado-field" data-editable="true">Operativo</td>
-          <th>Criticidad</th>
-          <td class="criticidad-field" data-editable="true">A</td>
-        </tr>
-      </tbody>
-    `;
-    
-    // Bloque "Condición"
-    const condLabel = document.createElement("div");
-    condLabel.classList.add("condicion-label");
-    condLabel.textContent = "Condición";
-    const condText = document.createElement("div");
-    condText.classList.add("condicion-text");
-    condText.setAttribute("data-editable", "true");
-    condText.textContent = "Se detecta anomalía térmica...";
-    
-    // Añadimos todos los elementos al wrapper y luego al contenedor principal
-    wrapper.append(removeBtn, secTitle, imageGrid, thermoTable, condLabel, condText);
-    document.getElementById("sectionsContainer").appendChild(wrapper);
-    
-    // Animación de aparición
-    setTimeout(() => {
-      wrapper.style.opacity = "1";
-    }, 50);
-    
-    // Agregar event listeners a los campos de edición para actualizar la tabla en cada cambio
-    const componentField = wrapper.querySelector('.component-field');
-    const estadoField = wrapper.querySelector('.estado-field');
-    const criticidadField = wrapper.querySelector('.criticidad-field');
-    if (componentField) componentField.addEventListener("input", updateSummaryTable);
-    if (estadoField) estadoField.addEventListener("input", updateSummaryTable);
-    if (criticidadField) {
-      criticidadField.addEventListener("input", () => {
-        updateCriticidadStyle(criticidadField);
-        updateSummaryTable();
       });
-      updateCriticidadStyle(criticidadField);
-    }
-    
-    // Si el modo edición está activo, asegurarse de que los nuevos elementos sean editables
-    if (document.getElementById("editModeCheckbox").checked) {
-      wrapper.querySelectorAll('[data-editable="true"]').forEach(el => {
-        el.contentEditable = true;
-      });
-    }
-    
-    // Actualiza la tabla resumen tras agregar la nueva sección
-    updateSummaryTable();
-  }
-  
-  /************************************************************
-   * 4) Modo Edición (Básico y Avanzado)
-   ************************************************************/
-  function toggleEditingMode(checkbox) {
-    const isEditing = checkbox.checked;
-    // Todos los elementos con data-editable se vuelven contentEditable si isEditing es true
-    document.querySelectorAll('[data-editable="true"]').forEach(el => {
-      el.contentEditable = isEditing;
-    });
-  }
-  function toggleAdvancedEditing(checkbox) {
-    const advanced = checkbox.checked;
-    // Permitir editar celdas de la tabla summary y títulos de sección si advanced = true
-    document.querySelectorAll('.summary-table th, .table-section-title').forEach(el => {
-      el.contentEditable = advanced;
-      el.style.border = advanced ? "1px dashed #000" : "";
-    });
-  }
-  function toggleRounding(checkbox) {
-    const rounding = checkbox.checked;
-    document.querySelectorAll('.summary-table th, .table-section-title, .removeSectionBtn').forEach(el => {
-      el.style.borderRadius = rounding ? "10px" : "0";
-    });
-  }
-  
-  /************************************************************
-   * 5) Temas de Encabezado y Temas Generales
-   ************************************************************/
-  function applyHeadingTheme() {
-    const font = document.getElementById('headingFontSelect').value;
-    const fontSize = document.getElementById('headingFontSize').value;
-    const color = document.getElementById('headingColorPicker').value;
-    const scope = document.querySelector('input[name="headingScope"]:checked').value;
-    if (scope === "todo") {
-      document.querySelectorAll('.summary-table th, .table-section-title, .removeSectionBtn').forEach(el => {
-        el.style.fontFamily = font;
-        el.style.fontSize = fontSize + "px";
-        el.style.color = color;
-      });
-    } else {
-      const selection = window.getSelection();
-      if (selection.rangeCount > 0) {
-        const range = selection.getRangeAt(0);
-        const span = document.createElement('span');
-        span.style.fontFamily = font;
-        span.style.fontSize = fontSize + "px";
-        span.style.color = color;
-        range.surroundContents(span);
-      }
-    }
-  }
-  function applyGeneralTheme() {
-    const generalFont = document.getElementById('generalFontSelect').value;
-    const generalFontSize = document.getElementById('generalFontSize').value;
-    const generalColor = document.getElementById('generalColorPicker').value;
-    const bgColor = document.getElementById('bgColorPicker').value;
-    document.body.style.fontFamily = generalFont;
-    document.body.style.fontSize = generalFontSize + 'px';
-    document.body.style.color = generalColor;
-    document.body.style.backgroundColor = bgColor;
-  }
-  
-  /************************************************************
-   * 6) Logos: Cargar y Eliminar
-   ************************************************************/
-  document.addEventListener('DOMContentLoaded', function() {
-    const leftLogoInput = document.getElementById('leftLogoInput');
-    const rightLogoInput = document.getElementById('rightLogoInput');
-    leftLogoInput.addEventListener('change', e => {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = evt => {
-          const img = document.getElementById('logoLeft');
-          img.src = evt.target.result;
-          img.style.display = 'block';
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-    rightLogoInput.addEventListener('change', e => {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = evt => {
-          const img = document.getElementById('logoRight');
-          img.src = evt.target.result;
-          img.style.display = 'block';
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-  });
-  function removeLogo(side) {
-    if (side === 'left') {
-      const img = document.getElementById('logoLeft');
-      img.src = "";
-      img.style.display = 'none';
-    } else if (side === 'right') {
-      const img = document.getElementById('logoRight');
-      img.src = "";
-      img.style.display = 'none';
-    }
-  }
-  
-  /************************************************************
-   * 7) Control de Márgenes, Interlineado, Espacio de Letras
-   ************************************************************/
-  const marginCtrl = document.getElementById('marginControl');
-  const lineHeightCtrl = document.getElementById('lineHeightControl');
-  const letterSpacingCtrl = document.getElementById('letterSpacingControl');
-  marginCtrl.addEventListener('input', () => {
-    document.getElementById('reportContainer').style.margin = marginCtrl.value + "px";
-  });
-  lineHeightCtrl.addEventListener('input', () => {
-    document.getElementById('reportContainer').style.lineHeight = lineHeightCtrl.value;
-  });
-  letterSpacingCtrl.addEventListener('input', () => {
-    document.getElementById('reportContainer').style.letterSpacing = letterSpacingCtrl.value + "px";
-  });
-  
-  /************************************************************
-   * 8) Guardar Configuración Predeterminada y Restablecer
-   ************************************************************/
-  function setDefaults() {
-    alert("Config predeterminada guardada (ejemplo).");
-  }
-  function resetDocument() {
-    if (confirm("¿Deseas restablecer el reporte a su versión base?")) {
-      location.reload();
-    }
-  }
-  
-  /************************************************************
-   * 9) Exportar PDF, Exportar Imagen
-   ************************************************************/
-  document.getElementById("exportPdfBtn").addEventListener("click", () => {
-    window.print();
-  });
-  document.getElementById("exportImageBtn").addEventListener("click", () => {
-    html2canvas(document.getElementById("reportContainer")).then(canvas => {
-      const imgData = canvas.toDataURL("image/png");
-      const link = document.createElement("a");
-      link.href = imgData;
-      link.download = "InformeTermografico.png";
-      link.click();
-    });
-  });
-  
-  /************************************************************
-   * 10) Guardar en Archivo (JSON) / Cargar desde Archivo (JSON)
-   ************************************************************/
-  document.getElementById("saveFileBtn").addEventListener("click", guardarEnArchivo);
-  document.getElementById("loadFileBtn").addEventListener("click", cargarDesdeArchivo);
-  
-  async function guardarEnArchivo() {
-    try {
-      // Guardamos solo las partes relevantes: la tabla summary, las secciones termográficas y el tema general.
-      const data = {
-        summaryTable: document.getElementById("summaryTable").innerHTML,
-        sectionsContainer: document.getElementById("sectionsContainer").innerHTML,
-        theme: {
-          fontFamily: document.body.style.fontFamily,
-          fontSize: document.body.style.fontSize,
-          color: document.body.style.color,
-          backgroundColor: document.body.style.backgroundColor
+      rightLogoInput.addEventListener('change', e => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = evt => {
+            const img = document.getElementById('logoRight');
+            img.src = evt.target.result;
+            img.style.display = 'block';
+          };
+          reader.readAsDataURL(file);
         }
-      };
-      const jsonData = JSON.stringify(data);
-      const blob = new Blob([jsonData], { type: "application/json" });
-      
-      // Intentamos la File System Access API si está disponible:
-      if (window.showSaveFilePicker) {
+      });
+    });
+    function removeLogo(side) {
+      if (side === 'left') {
+        const img = document.getElementById('logoLeft');
+        img.src = "";
+        img.style.display = 'none';
+      } else if (side === 'right') {
+        const img = document.getElementById('logoRight');
+        img.src = "";
+        img.style.display = 'none';
+      }
+    }
+    
+    /************************************************************
+     * Control de Márgenes, Interlineado y Espacio de Letras
+     ************************************************************/
+    const marginCtrl = document.getElementById('marginControl');
+    const lineHeightCtrl = document.getElementById('lineHeightControl');
+    const letterSpacingCtrl = document.getElementById('letterSpacingControl');
+    marginCtrl.addEventListener('input', () => {
+      document.getElementById('reportContainer').style.margin = marginCtrl.value + "px";
+    });
+    lineHeightCtrl.addEventListener('input', () => {
+      document.getElementById('reportContainer').style.lineHeight = lineHeightCtrl.value;
+    });
+    letterSpacingCtrl.addEventListener('input', () => {
+      document.getElementById('reportContainer').style.letterSpacing = letterSpacingCtrl.value + "px";
+    });
+    
+    /************************************************************
+     * Guardar Configuración Predeterminada y Restablecer
+     ************************************************************/
+    function setDefaults() {
+      alert("Config predeterminada guardada (ejemplo).");
+    }
+    function resetDocument() {
+      if (confirm("¿Deseas restablecer el reporte a su versión base?")) {
+        location.reload();
+      }
+    }
+    
+    /************************************************************
+     * Exportar PDF e Imagen
+     ************************************************************/
+    document.getElementById("exportPdfBtn").addEventListener("click", () => {
+      window.print();
+    });
+    document.getElementById("exportImageBtn").addEventListener("click", () => {
+      html2canvas(document.getElementById("reportContainer")).then(canvas => {
+        const imgData = canvas.toDataURL("image/png");
+        const link = document.createElement("a");
+        link.href = imgData;
+        link.download = "InformeTermografico.png";
+        link.click();
+      });
+    });
+    
+    /************************************************************
+     * Guardar/Cargar Archivo JSON
+     ************************************************************/
+    document.getElementById("saveFileBtn").addEventListener("click", guardarEnArchivo);
+    document.getElementById("loadFileBtn").addEventListener("click", cargarDesdeArchivo);
+    
+    async function guardarEnArchivo() {
+      try {
+        const data = {
+          summaryTable: document.getElementById("summaryTable").innerHTML,
+          sectionsContainer: document.getElementById("sectionsContainer").innerHTML,
+          theme: {
+            fontFamily: document.body.style.fontFamily,
+            fontSize: document.body.style.fontSize,
+            color: document.body.style.color,
+            backgroundColor: document.body.style.backgroundColor
+          }
+        };
+        const jsonData = JSON.stringify(data);
+        const blob = new Blob([jsonData], { type: "application/json" });
+        if (window.showSaveFilePicker) {
+          const opciones = {
+            types: [{
+              description: "Archivos JSON",
+              accept: { "application/json": [".json"] }
+            }]
+          };
+          const handle = await window.showSaveFilePicker(opciones);
+          const writable = await handle.createWritable();
+          await writable.write(blob);
+          await writable.close();
+        } else {
+          const a = document.createElement("a");
+          a.href = URL.createObjectURL(blob);
+          a.download = "ReporteTermografico.json";
+          a.click();
+          URL.revokeObjectURL(a.href);
+        }
+        alert("Datos guardados en el archivo seleccionado.");
+      } catch (err) {
+        console.error("Error al guardar en archivo:", err);
+        alert("Error al guardar el archivo.");
+      }
+    }
+    
+    async function cargarDesdeArchivo() {
+      try {
         const opciones = {
           types: [{
             description: "Archivos JSON",
             accept: { "application/json": [".json"] }
           }]
         };
-        const handle = await window.showSaveFilePicker(opciones);
-        const writable = await handle.createWritable();
-        await writable.write(blob);
-        await writable.close();
-      } else {
-        // Fallback: descarga el archivo .json
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = "ReporteTermografico.json";
-        a.click();
-        URL.revokeObjectURL(a.href);
-      }
-      alert("Datos guardados en el archivo seleccionado.");
-    } catch (err) {
-      console.error("Error al guardar en archivo:", err);
-      alert("Error al guardar el archivo.");
-    }
-  }
-  
-  async function cargarDesdeArchivo() {
-    try {
-      const opciones = {
-        types: [{
-          description: "Archivos JSON",
-          accept: { "application/json": [".json"] }
-        }]
-      };
-      let handle;
-      // Intentamos la File System Access API si está disponible:
-      if (window.showOpenFilePicker) {
-        [handle] = await window.showOpenFilePicker(opciones);
-        const file = await handle.getFile();
-        const contents = await file.text();
-        const data = JSON.parse(contents);
-        restaurarDatosDesdeJSON(data);
-      } else {
-        // Fallback: input file manual
-        const input = document.createElement("input");
-        input.type = "file";
-        input.accept = ".json";
-        input.onchange = e => {
-          const file = e.target.files[0];
-          if (!file) return;
-          const reader = new FileReader();
-          reader.onload = ev => {
-            const data = JSON.parse(ev.target.result);
-            restaurarDatosDesdeJSON(data);
+        let handle;
+        if (window.showOpenFilePicker) {
+          [handle] = await window.showOpenFilePicker(opciones);
+          const file = await handle.getFile();
+          const contents = await file.text();
+          const data = JSON.parse(contents);
+          restaurarDatosDesdeJSON(data);
+        } else {
+          const input = document.createElement("input");
+          input.type = "file";
+          input.accept = ".json";
+          input.onchange = e => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = ev => {
+              const data = JSON.parse(ev.target.result);
+              restaurarDatosDesdeJSON(data);
+            };
+            reader.readAsText(file);
           };
-          reader.readAsText(file);
-        };
-        input.click();
+          input.click();
+        }
+      } catch (err) {
+        console.error("Error al cargar desde archivo:", err);
+        alert("Error al cargar el archivo.");
       }
-    } catch (err) {
-      console.error("Error al cargar desde archivo:", err);
-      alert("Error al cargar el archivo.");
     }
-  }
-  
-  function restaurarDatosDesdeJSON(data) {
-    // Restauramos la tabla summary, las secciones y el tema general.
-    document.getElementById("summaryTable").innerHTML = data.summaryTable || "";
-    document.getElementById("sectionsContainer").innerHTML = data.sectionsContainer || "";
-    const theme = data.theme || {};
-    document.body.style.fontFamily = theme.fontFamily || "";
-    document.body.style.fontSize = theme.fontSize || "";
-    document.body.style.color = theme.color || "";
-    document.body.style.backgroundColor = theme.backgroundColor || "";
     
-    alert("Datos cargados correctamente desde el archivo JSON.");
-  }
+    function restaurarDatosDesdeJSON(data) {
+      document.getElementById("summaryTable").innerHTML = data.summaryTable || "";
+      document.getElementById("sectionsContainer").innerHTML = data.sectionsContainer || "";
+      const theme = data.theme || {};
+      document.body.style.fontFamily = theme.fontFamily || "";
+      document.body.style.fontSize = theme.fontSize || "";
+      document.body.style.color = theme.color || "";
+      document.body.style.backgroundColor = theme.backgroundColor || "";
+      // Reaplicar el modo edición si está activo
+      toggleEditingMode(document.getElementById("editModeCheckbox"));
+      alert("Datos cargados correctamente desde el archivo JSON.");
+    }
   </script>
 </body>
 </html>
