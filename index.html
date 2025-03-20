@@ -557,12 +557,7 @@
           </tr>
         </thead>
         <tbody id="summaryTableBody">
-          <tr data-section-id="init">
-            <td class="counterCell">1</td>
-            <td class="compCell">Equipo XYZ</td>
-            <td class="estCell">Operativo</td>
-            <td class="critCell">A</td>
-          </tr>
+          <!-- Se actualiza automáticamente -->
         </tbody>
       </table>
       
@@ -653,7 +648,68 @@
   }
   
   /************************************************************
-   * 2) Crear Sección Termográfica
+   * 2) Función para actualizar la tabla resumen
+   *    Recorre todas las secciones termográficas y reconstruye la tabla.
+   *    Además, actualiza el estilo de la celda de criticidad según su valor.
+   ************************************************************/
+  function updateSummaryTable() {
+    const summaryTableBody = document.getElementById('summaryTableBody');
+    summaryTableBody.innerHTML = ""; // Limpiar contenido previo
+    const sections = document.querySelectorAll('.termografia-section-wrapper');
+    let counter = 1;
+    sections.forEach(section => {
+      const comp = section.querySelector('.component-field')?.textContent || '';
+      const estado = section.querySelector('.estado-field')?.textContent || '';
+      const criticidad = section.querySelector('.criticidad-field')?.textContent || '';
+      
+      const tr = document.createElement('tr');
+      tr.setAttribute('data-section-id', section.getAttribute('data-section-id'));
+      
+      const tdCounter = document.createElement('td');
+      tdCounter.classList.add('counterCell');
+      tdCounter.textContent = counter++;
+      
+      const tdComp = document.createElement('td');
+      tdComp.classList.add('compCell');
+      tdComp.textContent = comp;
+      
+      const tdEstado = document.createElement('td');
+      tdEstado.classList.add('estCell');
+      tdEstado.textContent = estado;
+      
+      const tdCrit = document.createElement('td');
+      tdCrit.classList.add('critCell');
+      tdCrit.textContent = criticidad;
+      
+      // Cambiar color según el valor de criticidad
+      switch(criticidad.trim().toUpperCase()){
+        case 'B': // Verde
+          tdCrit.style.backgroundColor = "green";
+          tdCrit.style.color = "green";
+          break;
+        case 'A': // Amarillo
+          tdCrit.style.backgroundColor = "yellow";
+          tdCrit.style.color = "yellow";
+          break;
+        case 'C': // Rojo
+          tdCrit.style.backgroundColor = "red";
+          tdCrit.style.color = "red";
+          break;
+        default:
+          tdCrit.style.backgroundColor = "";
+          tdCrit.style.color = "";
+      }
+      
+      tr.append(tdCounter, tdComp, tdEstado, tdCrit);
+      summaryTableBody.appendChild(tr);
+    });
+  }
+  
+  /************************************************************
+   * 3) Crear Sección Termográfica
+   *    Al finalizar la creación, se actualiza la tabla resumen.
+   *    Además, se agregan event listeners para actualizar la tabla
+   *    cuando se editen los campos "Componente", "Estado" y "Criticidad".
    ************************************************************/
   let sectionCounter = 0;
   document.getElementById("addTermografiaSectionBtn").addEventListener("click", () => {
@@ -675,7 +731,10 @@
     removeBtn.addEventListener("click", () => {
       if (confirm("¿Eliminar esta sección?")) {
         wrapper.style.opacity = "0";
-        setTimeout(() => wrapper.remove(), 400);
+        setTimeout(() => {
+          wrapper.remove();
+          updateSummaryTable(); // Actualiza la tabla tras eliminar
+        }, 400);
       }
     });
     
@@ -755,18 +814,29 @@
     condText.setAttribute("data-editable", "true");
     condText.textContent = "Se detecta anomalía térmica...";
     
-    // Añadimos todo al wrapper y luego al contenedor principal (#sectionsContainer)
+    // Añadimos todos los elementos al wrapper y luego al contenedor principal
     wrapper.append(removeBtn, secTitle, imageGrid, thermoTable, condLabel, condText);
     document.getElementById("sectionsContainer").appendChild(wrapper);
     
-    // Pequeña animación de aparición
+    // Animación de aparición
     setTimeout(() => {
       wrapper.style.opacity = "1";
     }, 50);
+    
+    // Agregar event listeners a los campos de edición para actualizar la tabla en cada cambio
+    const componentField = wrapper.querySelector('.component-field');
+    const estadoField = wrapper.querySelector('.estado-field');
+    const criticidadField = wrapper.querySelector('.criticidad-field');
+    if (componentField) componentField.addEventListener("input", updateSummaryTable);
+    if (estadoField) estadoField.addEventListener("input", updateSummaryTable);
+    if (criticidadField) criticidadField.addEventListener("input", updateSummaryTable);
+    
+    // Actualiza la tabla resumen tras agregar la nueva sección
+    updateSummaryTable();
   }
   
   /************************************************************
-   * 3) Modo Edición (Básico y Avanzado)
+   * 4) Modo Edición (Básico y Avanzado)
    ************************************************************/
   function toggleEditingMode(checkbox) {
     const isEditing = checkbox.checked;
@@ -791,7 +861,7 @@
   }
   
   /************************************************************
-   * 4) Temas de Encabezado y Temas Generales
+   * 5) Temas de Encabezado y Temas Generales
    ************************************************************/
   function applyHeadingTheme() {
     const font = document.getElementById('headingFontSelect').value;
@@ -828,7 +898,7 @@
   }
   
   /************************************************************
-   * 5) Logos: Cargar y Eliminar
+   * 6) Logos: Cargar y Eliminar
    ************************************************************/
   document.addEventListener('DOMContentLoaded', function() {
     const leftLogoInput = document.getElementById('leftLogoInput');
@@ -871,7 +941,7 @@
   }
   
   /************************************************************
-   * 6) Control de Márgenes, Interlineado, Espacio de Letras
+   * 7) Control de Márgenes, Interlineado, Espacio de Letras
    ************************************************************/
   const marginCtrl = document.getElementById('marginControl');
   const lineHeightCtrl = document.getElementById('lineHeightControl');
@@ -887,7 +957,7 @@
   });
   
   /************************************************************
-   * 7) Guardar Configuración Predeterminada y Restablecer
+   * 8) Guardar Configuración Predeterminada y Restablecer
    ************************************************************/
   function setDefaults() {
     alert("Config predeterminada guardada (ejemplo).");
@@ -899,7 +969,7 @@
   }
   
   /************************************************************
-   * 8) Exportar PDF, Exportar Imagen
+   * 9) Exportar PDF, Exportar Imagen
    ************************************************************/
   document.getElementById("exportPdfBtn").addEventListener("click", () => {
     window.print();
@@ -915,14 +985,14 @@
   });
   
   /************************************************************
-   * 9) Guardar en Archivo (JSON) / Cargar desde Archivo (JSON)
+   * 10) Guardar en Archivo (JSON) / Cargar desde Archivo (JSON)
    ************************************************************/
   document.getElementById("saveFileBtn").addEventListener("click", guardarEnArchivo);
   document.getElementById("loadFileBtn").addEventListener("click", cargarDesdeArchivo);
   
   async function guardarEnArchivo() {
     try {
-      // Guardamos solo las partes relevantes: la tabla summary y las secciones termográficas, más el tema general.
+      // Guardamos solo las partes relevantes: la tabla summary, las secciones termográficas y el tema general.
       const data = {
         summaryTable: document.getElementById("summaryTable").innerHTML,
         sectionsContainer: document.getElementById("sectionsContainer").innerHTML,
@@ -1017,4 +1087,3 @@
   </script>
 </body>
 </html>
-
