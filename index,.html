@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Informe Termográfico - Layout con Sidebar y Guardado en Archivo</title>
+  <style>
+    :root {
+      --theme-color: #c00000; /* Color rojo principal */
+      --transition-speed: 0.3s;
+    }
+    @page { margin: 1in; }
+    
+    /* ===== REINICIO Y LAYOUT GLOBAL ===== */
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: #f0f4fa;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* CONTENEDOR PRINCIPAL: Sidebar + Reporte */
+    .layout-container {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+    
+    /* ===== MENÚ LATERAL (SIDEBAR) MEJORADO ===== */
+    /* Se oculta en impresión usando la clase "no-print" */
+    #sidebar.no-print {
+      width: 280px;
+      min-width: 240px;
+      background: linear-gradient(135deg, #ffffff, #f8f8f8);
+      border-right: 1px solid #e0e0e0;
+      padding: 20px;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+      border-top-right-radius: 15px;
+      border-bottom-right-radius: 15px;
+      box-sizing: border-box;
+      overflow-y: auto;
+      transition: all 0.3s ease;
+    }
+    #sidebar.no-print:hover {
+      box-shadow: 2px 0 12px rgba(0, 0, 0, 0.15);
+    }
+    #sidebar h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 1.4em;
+      color: #333;
+      border-bottom: 2px solid var(--theme-color);
+      padding-bottom: 10px;
+    }
+    .option-group {
+      margin-bottom: 15px;
+      display: flex; 
+      align-items: center;
+    }
+    /* Etiqueta para el switch */
+    .switch-label {
+      font-size: 0.95em;
+      color: #555;
+      user-select: none;
+    }
+    /* ===== ESTILOS PARA LOS SWITCHES ===== */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 26px;
+      margin-right: 10px;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 26px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: #fff;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    .switch input:checked + .slider {
+      background-color: var(--theme-color);
+    }
+    .switch input:focus + .slider {
+      box-shadow: 0 0 2px var(--theme-color);
+    }
+    .switch input:checked + .slider:before {
+      transform: translateX(24px);
+    }
+    
+    .options-buttons {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .options-buttons button {
+      margin: 5px;
+      padding: 8px 14px;
+      font-size: 0.95em;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .btn-primary {
+      background: var(--theme-color);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: #a00000;
+      transform: scale(1.03);
+    }
+    .btn-danger {
+      background: #d9534f;
+      color: #fff;
+    }
+    .btn-danger:hover {
+      background: #c9302c;
+      transform: scale(1.03);
+    }
+    
+    /* ===== ÁREA PRINCIPAL (REPORTE) ===== */
+    .report-container {
+      flex: 1;
+      margin: 20px;
+      background: #fff;
+      border-radius: 6px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      transition: width var(--transition-speed) ease, border-radius var(--transition-speed);
+      border: 1px solid #ccc;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      box-sizing: border-box;
+    }
+    
+    /* ===== REGLA PARA IMPRESIÓN ===== */
+    @media print {
+      /* Oculta todos los elementos con la clase "no-print" */
+      .no-print {
+        display: none !important;
+      }
+      .report-container {
+        margin: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        width: auto !important;
+      }
+    }
+    
+    /* ===== ESTILOS DEL REPORTE (De Anexo.html) ===== */
+    .summary-table-title {
+      background: var(--theme-color);
+      color: #fff;
+      text-align: center;
+      font-weight: bold;
+      padding: 8px;
+      margin-bottom: 5px;
+      font-size: 1.1em;
+      transition: background var(--transition-speed);
+    }
+    .summary-table {
+      border-collapse: separate;
+      border-spacing: 6px;
+      width: 100%;
+      margin-bottom: 20px;
+    }
+    .summary-table th,
+    .summary-table td {
+      background: #fff;
+      padding: 8px;
+      font-size: 0.9em;
+      border: none;
+      vertical-align: middle;
+      transition: border-radius var(--transition-speed);
+    }
+    .summary-table th {
+      background: var(--theme-color);
+      color: #fff;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .counterCell {
+      text-align: center;
+      font-weight: bold;
+      width: 40px;
+    }
+    .compCell,
+    .estCell,
+    .critCell {
+      border: 1px solid #ccc !important;
+    }
+    .critCell {
+      text-align: center;
+      font-weight: bold;
+      width: 100px;
+    }
+    
+    /* Secciones Termográficas */
+    .termografia-section-wrapper {
+      margin-bottom: 30px;
+      transition: opacity 0.4s;
+    }
+    /* Botón "Eliminar Sección" -> se oculta en impresión (no-print) */
+    .removeSectionBtn {
+      background: #900000;
+      color: #fff;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      float: right;
+      margin-bottom: 10px;
+      font-size: 0.85em;
+      transition: background var(--transition-speed), transform var(--transition-speed);
+    }
+    .removeSectionBtn:hover {
+      background: #c00000;
+      transform: scale(1.05);
+    }
+    .image-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: space-around;
+      margin-bottom: 20px;
+    }
+    .image-box {
+      flex: 1 1 45%;
+      min-height: 200px;
+      border: 1px dashed #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: 5px;
+      cursor: pointer;
+      transition: box-shadow 0.2s;
+    }
+    .image-box:hover {
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .preview-image {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+    /* Botón "Eliminar Imagen" -> ahora restablece la imagen (no elimina el contenedor) */
+    .removeFrameBtn {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background: var(--theme-color);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background var(--transition-speed), transform var(--transition-speed);
+    }
+    .removeFrameBtn:hover {
+      background: #900000;
+      transform: scale(1.1);
+    }
+    /* Botón "Agregar Sección" -> se oculta en impresión */
+    .addSectionBtn.no-print {
+      background: #28a745;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1em;
+      margin: 20px auto;
+      display: block;
+      transition: background var(--transition-speed), transform var(--transition-speed);
+    }
+    .addSectionBtn.no-print:hover {
+      background: #218838;
+      transform: scale(1.05);
+    }
+    .table-section-title {
+      background: var(--theme-color);
+      color: #fff;
+      text-align: center;
+      font-weight: bold;
+      padding: 6px;
+      font-size: 1em;
+    }
+    .thermo-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    .thermo-table th,
+    .thermo-table td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      font-size: 0.9em;
+      vertical-align: middle;
+    }
+    .condicion-label {
+      background: var(--theme-color);
+      color: #fff;
+      text-align: center;
+      font-weight: bold;
+      padding: 6px;
+      margin-bottom: 5px;
+      font-size: 1em;
+      transition: background var(--transition-speed);
+    }
+    .condicion-text {
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      line-height: 1.5;
+      font-size: 0.9em;
+      white-space: pre-line;
+    }
+    
+    /* PIE DE PÁGINA (Exportar / Guardar) - se oculta en impresión */
+    .pdf-export-container.no-print {
+      text-align: center;
+      margin: 20px 0;
+    }
+    .pdf-export-container.no-print button {
+      margin: 0 5px;
+      border: none;
+      border-radius: 4px;
+      padding: 8px 16px;
+      cursor: pointer;
+      color: #fff;
+      transition: background var(--transition-speed), transform var(--transition-speed);
+    }
+    #exportPdfBtn {
+      background: #6c757d;
+    }
+    #exportPdfBtn:hover {
+      background: #5a6268;
+      transform: scale(1.05);
+    }
+    #exportImageBtn {
+      background: #ff8c00;
+    }
+    #exportImageBtn:hover {
+      background: #e65100;
+      transform: scale(1.05);
+    }
+    /* Nuevos botones para guardar/cargar archivo */
+    .btn-saveFile {
+      background: #28a745;
+    }
+    .btn-saveFile:hover {
+      background: #218838;
+      transform: scale(1.05);
+    }
+    .btn-loadFile {
+      background: #007bff;
+    }
+    .btn-loadFile:hover {
+      background: #0056b3;
+      transform: scale(1.05);
+    }
+    
+    /* LOGOS y MARCA DE AGUA */
+    #logoContainer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      position: relative;
+    }
+    #logoLeft, #logoRight {
+      display: none;
+      width: 150px;
+      height: 100px;
+      object-fit: contain;
+    }
+    #logoLeft[src], #logoRight[src] {
+      display: block;
+    }
+    #watermarkOverlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 4em;
+      color: rgba(200, 200, 200, 0.3);
+      pointer-events: none;
+      white-space: nowrap;
+      z-index: 100;
+    }
+    
+    /* EDICIÓN (Focus) */
+    [contenteditable="true"]:focus {
+      outline: 2px dashed var(--theme-color);
+      background: #fef6f6;
+    }
+  </style>
+</head>
+<body>
+  <!-- CONTENEDOR FLEX: SIDEBAR + REPORTE -->
+  <div class="layout-container">
+    
+    <!-- SIDEBAR: Opciones de Edición (no-print para que no se imprima) -->
+    <div id="sidebar" class="no-print">
+      <h2>Opciones de Edición</h2>
+      
+      <!-- Modo edición -->
+      <div class="option-group">
+        <label class="switch">
+          <input type="checkbox" id="editModeCheckbox" checked onchange="toggleEditingMode(this)">
+          <span class="slider"></span>
+        </label>
+        <span class="switch-label">Activar modo edición</span>
+      </div>
+      
+      <!-- Edición avanzada -->
+      <div class="option-group">
+        <label class="switch">
+          <input type="checkbox" id="advancedEditCheckbox" onchange="toggleAdvancedEditing(this)">
+          <span class="slider"></span>
+        </label>
+        <span class="switch-label">Edición avanzada</span>
+      </div>
+      
+      <!-- Redondear elementos rojos -->
+      <div class="option-group">
+        <label class="switch">
+          <input type="checkbox" id="roundingCheckbox" onchange="toggleRounding(this)">
+          <span class="slider"></span>
+        </label>
+        <span class="switch-label">Redondear elementos rojos</span>
+      </div>
+      
+      <!-- Temas Encabezados -->
+      <fieldset class="option-group" style="flex-direction: column; align-items: flex-start;">
+        <legend>Temas Encabezados</legend>
+        <label>Fuente:
+          <select id="headingFontSelect">
+            <option value="Arial, sans-serif">Arial</option>
+            <option value="'Times New Roman', serif">Times New Roman</option>
+            <option value="Georgia, serif">Georgia</option>
+            <option value="'Courier New', monospace">Courier New</option>
+          </select>
+        </label>
+        <label>Tamaño (px):
+          <input type="number" id="headingFontSize" value="18" min="8" max="72">
+        </label>
+        <label>Color texto:
+          <input type="color" id="headingColorPicker" value="#ffffff">
+        </label>
+        <label>Aplicar a:
+          <input type="radio" name="headingScope" value="todo" checked> Todo
+          <input type="radio" name="headingScope" value="seleccionado"> Seleccionado
+        </label>
+        <button class="btn-primary" onclick="applyHeadingTheme()">Aplicar Encabezados</button>
+      </fieldset>
+      
+      <!-- Temas Generales -->
+      <fieldset class="option-group" style="flex-direction: column; align-items: flex-start;">
+        <legend>Temas Generales</legend>
+        <label>Fuente:
+          <select id="generalFontSelect">
+            <option value="Arial, sans-serif">Arial</option>
+            <option value="'Times New Roman', serif">Times New Roman</option>
+            <option value="Georgia, serif">Georgia</option>
+            <option value="'Courier New', monospace">Courier New</option>
+          </select>
+        </label>
+        <label>Tamaño (px):
+          <input type="number" id="generalFontSize" value="14" min="8" max="72">
+        </label>
+        <label>Color texto:
+          <input type="color" id="generalColorPicker" value="#000000">
+        </label>
+        <label>Color fondo:
+          <input type="color" id="bgColorPicker" value="#f0f4fa">
+        </label>
+        <button class="btn-primary" onclick="applyGeneralTheme()">Aplicar Tema General</button>
+      </fieldset>
+      
+      <!-- Logos -->
+      <fieldset class="option-group" style="flex-direction: column; align-items: flex-start;">
+        <legend>Logos</legend>
+        <label>Logo Izquierdo:
+          <input type="file" id="leftLogoInput" accept="image/*">
+        </label>
+        <button class="btn-danger" onclick="removeLogo('left')">Eliminar Logo Izq.</button>
+        <br><br>
+        <label>Logo Derecho:
+          <input type="file" id="rightLogoInput" accept="image/*">
+        </label>
+        <button class="btn-danger" onclick="removeLogo('right')">Eliminar Logo Der.</button>
+      </fieldset>
+      
+      <!-- Estilos del Reporte -->
+      <fieldset class="option-group" style="flex-direction: column; align-items: flex-start;">
+        <legend>Estilos del Reporte</legend>
+        <label>Margen (px):
+          <input type="number" id="marginControl" value="20" min="0" max="100">
+        </label>
+        <label>Interlineado:
+          <input type="number" step="0.1" id="lineHeightControl" value="1.4" min="1" max="3">
+        </label>
+        <label>Espacio Letras (px):
+          <input type="number" step="0.1" id="letterSpacingControl" value="0" min="0" max="5">
+        </label>
+      </fieldset>
+      
+      <!-- Botones de Configuración -->
+      <div class="options-buttons">
+        <button class="btn-primary" onclick="setDefaults()">Guardar Config. Predeterminada</button>
+        <button class="btn-danger" onclick="resetDocument()">Restablecer Reporte</button>
+      </div>
+    </div>
+    
+    <!-- CONTENIDO PRINCIPAL (REPORTE) -->
+    <div id="mainContainer">
+      <div id="logoContainer">
+        <img id="logoLeft" src="" alt="Logo Izquierdo">
+        <img id="logoRight" src="" alt="Logo Derecho">
+      </div>
+      <div class="section-title" id="mainTitle">Reporte de Termografía Infrarroja</div>
+      <div class="no-print" style="margin-bottom: 20px; text-align: right;">
+        <button class="btn btn-primary" onclick="addHeaderRow()">Agregar Fila Encabezado</button>
+        <button class="btn btn-danger" onclick="removeSelectedHeaderRows()">Eliminar Fila Seleccionada</button>
+      </div>
+      <table class="header-table" id="headerTable">
+        <tr>
+          <td class="label-red">
+            <input type="checkbox" class="header-select" /> Tipo de Reporte
+          </td>
+          <td class="white-field"><input type="text" placeholder="Termografía Infrarroja"></td>
+          <td class="label-red">
+            <input type="checkbox" class="header-select" /> Equipo de Medición
+          </td>
+          <td class="white-field"><input type="text" placeholder="Coco-TA1"></td>
+        </tr>
+        <tr>
+          <td class="label-red">
+            <input type="checkbox" class="header-select" /> Equipo
+          </td>
+          <td class="white-field"><input type="text" placeholder="Bomba de Ipyon1"></td>
+          <td class="label-red">
+            <input type="checkbox" class="header-select" /> Sistema
+          </td>
+          <td class="white-field"><input type="text" placeholder="HM - Wet Plant"></td>
+        </tr>
+        <tr>
+          <td class="label-red">
+            <input type="checkbox" class="header-select" /> Asset
+          </td>
+          <td class="white-field"><input type="text" placeholder="N/A"></td>
+          <td class="label-red">
+            <input type="checkbox" class="header-select" /> Planta
+          </td>
+          <td class="white-field"><input type="text" placeholder="Wet Plant"></td>
+        </tr>
+        <tr>
+          <td class="label-red">
+            <input type="checkbox" class="header-select" /> Condición de Operación
+          </td>
+          <td class="white-field"><input type="text" placeholder="Continua"></td>
+          <td class="label-red">
+            <input type="checkbox" class="header-select" /> Fecha de Reporte
+          </td>
+          <td class="white-field"><input type="text" class="date-picker" placeholder="Selecciona fecha"></td>
+        </tr>
+        <tr>
+          <td class="label-red">
+            <input type="checkbox" class="header-select" /> Fecha Mantenimiento
+          </td>
+          <td class="white-field"><input type="text" class="date-picker" placeholder="Selecciona fecha"></td>
+          <td class="label-red">
+            <input type="checkbox" class="header-select" /> Analista
+          </td>
+          <td class="white-field"><input type="text" placeholder="José Espinosa"></td>
+        </tr>
+        <tr>
+          <td class="label-red">
+            <input type="checkbox" class="header-select" /> Objetivo
+          </td>
+          <td class="white-field" colspan="3">
+            <textarea rows="2" placeholder="Evaluación de desempeño y condición mecánica del activo mediante análisis de vibraciones"></textarea>
+          </td>
+        </tr>
+      </table>
+      <hr class="hr-gradient">
+      <div class="section-title">Equipos Inspeccionados</div>
+      <div id="tableEditButtons" class="no-print" style="display: none;">
+        <input type="file" id="fileInput" accept=".csv" style="display: none;" onchange="importCSV()">
+        <button id="importBtn" class="btn btn-file" onclick="document.getElementById('fileInput').click()">Importar lista de equipos</button>
+        <button id="addRowBtn" class="btn btn-primary" onclick="addRow()">Agregar Fila</button>
+        <button id="removeRowsBtn" class="btn btn-danger" onclick="removeSelectedRows()">Eliminar filas seleccionadas</button>
+        <button id="duplicateRowsBtn" class="btn btn-success" onclick="duplicateSelectedRows()">Duplicar filas seleccionadas</button>
+      </div>
+      <table class="inspection-table" id="inspectionTable">
+        <thead>
+          <tr>
+            <th class="sel-column">Sel.</th>
+            <th>Equipo</th>
+            <th>Mes de Inspección</th>
+            <th>Ubicación</th>
+            <th>Estado (B/A/C)</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="sel-column"><input type="checkbox" name="rowSelector"></td>
+            <td><input type="text" name="equipo[]"></td>
+            <td><input type="month" name="mesInspeccion[]"></td>
+            <td><input type="text" name="ubicacion[]"></td>
+            <td><input type="text" name="estado[]" placeholder="B / A / C" oninput="updateEstadoColor(this)"></td>
+            <td><input type="text" name="acciones[]" placeholder="Acciones..."></td>
+          </tr>
+        </tbody>
+      </table>
+      <div id="chartSection">
+        <div class="section-title">Resumen de Estados de Equipos</div>
+        <div class="chart-container">
+          <canvas id="statusChart"></canvas>
+        </div>
+      </div>
+      <hr class="hr-gradient">
+      <div class="signature-section">
+        <div class="section-title">Firma Digital</div>
+        <div class="signatures-container">
+          <div class="signature-block">
+            <p class="signature-label">Nombre del responsable:</p>
+            <input type="text" placeholder="Ingresa tu nombre aquí" style="width: 300px;">
+            <br><br>
+            <canvas id="signatureCanvas" width="400" height="100" style="border:1px solid #ccc;"></canvas>
+            <br><br>
+            <button class="btn btn-danger no-print" onclick="clearSignature()">Borrar firma</button>
+          </div>
+          <div class="signature-block">
+            <p class="signature-label">Nombre del responsable 2:</p>
+            <input type="text" placeholder="Ingresa el nombre para la segunda firma" style="width: 300px;">
+            <br><br>
+            <canvas id="signatureCanvas2" width="400" height="100" style="border:1px solid #ccc;"></canvas>
+            <br><br>
+            <button class="btn btn-danger no-print" onclick="clearSecondSignature()">Borrar segunda firma</button>
+          </div>
+        </div>
+      </div>
+      <div class="no-print" style="text-align: center; margin-top: 20px;">
+        <button class="btn btn-success" onclick="saveReport()">Guardar Reporte</button>
+        <button class="btn btn-primary" onclick="printReport()">Imprimir Reporte</button>
+      </div>
+      <div class="fs-buttons no-print">
+        <button class="btn btn-saveFile" id="saveFileBtn">💾 Guardar en Archivo</button>
+        <button class="btn btn-loadFile" id="loadFileBtn">📂 Cargar desde Archivo</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Librería html2canvas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script>
+  /************************************************************
+   * 1) Función para crear un contenedor .image-box
+   *    con doble clic para adjuntar imagen y pegar desde portapapeles.
+   *    El botón "🗑" restablece la imagen al placeholder sin eliminar el contenedor.
+   ************************************************************/
+  function createImageBox(placeholderText) {
+    const div = document.createElement("div");
+    div.classList.add("image-box");
+    div.setAttribute("tabindex", "0");
+    
+    const placeholderURL = "https://via.placeholder.com/400x300?text=" + encodeURIComponent(placeholderText);
+    
+    // Imagen placeholder
+    const img = document.createElement("img");
+    img.classList.add("preview-image");
+    img.src = placeholderURL;
+    img.alt = placeholderText;
+    
+    // Botón para restablecer la imagen (solo restablece, no elimina el contenedor)
+    const removeBtn = document.createElement("button");
+    removeBtn.classList.add("removeFrameBtn", "no-print");
+    removeBtn.title = "Eliminar imagen";
+    removeBtn.textContent = "🗑";
+    removeBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      img.src = placeholderURL;
+    });
+    
+    // Input para seleccionar imagen
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = "image/*";
+    fileInput.style.display = "none";
+    fileInput.addEventListener("change", () => {
+      if (fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          img.src = ev.target.result;
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+      }
+    });
+    
+    // Doble clic: abrir selector de archivos
+    div.addEventListener("dblclick", () => fileInput.click());
+    
+    // Pegar imagen desde portapapeles
+    div.addEventListener("paste", (e) => {
+      const items = e.clipboardData.items;
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf("image") === 0) {
+          const file = items[i].getAsFile();
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            img.src = ev.target.result;
+          };
+          reader.readAsDataURL(file);
+          e.preventDefault();
+        }
+      }
+    });
+    
+    div.append(removeBtn, img, fileInput);
+    return div;
+  }
+  
+  /************************************************************
+   * 2) Crear Sección Termográfica
+   ************************************************************/
+  let sectionCounter = 0;
+  document.getElementById("addTermografiaSectionBtn").addEventListener("click", () => {
+    createTermografiaSection();
+  });
+  function createTermografiaSection() {
+    sectionCounter++;
+    const secId = "sec_" + sectionCounter;
+    
+    const wrapper = document.createElement("div");
+    wrapper.classList.add("termografia-section-wrapper");
+    wrapper.style.opacity = "0";
+    wrapper.setAttribute("data-section-id", secId);
+    
+    // Botón para eliminar sección (no imprime)
+    const removeBtn = document.createElement("button");
+    removeBtn.classList.add("removeSectionBtn", "no-print");
+    removeBtn.textContent = "🗑 Eliminar Sección";
+    removeBtn.addEventListener("click", () => {
+      if (confirm("¿Eliminar esta sección?")) {
+        wrapper.style.opacity = "0";
+        setTimeout(() => wrapper.remove(), 400);
+      }
+    });
+    
+    // Título de la sección
+    const secTitle = document.createElement("h3");
+    secTitle.style.background = "var(--theme-color)";
+    secTitle.style.color = "#fff";
+    secTitle.style.padding = "8px";
+    secTitle.style.borderRadius = "4px";
+    secTitle.style.fontSize = "1.1em";
+    secTitle.textContent = `Sección Termográfica #${sectionCounter}`;
+    
+    // Grid de imágenes
+    const imageGrid = document.createElement("div");
+    imageGrid.classList.add("image-grid");
+    const box1 = createImageBox("Imagen Térmica");
+    const box2 = createImageBox("Imagen Visual");
+    imageGrid.append(box1, box2);
+    
+    // Tabla de Datos
+    const thermoTable = document.createElement("table");
+    thermoTable.classList.add("thermo-table");
+    thermoTable.innerHTML = `
+      <tbody>
+        <tr>
+          <th colspan="6" class="table-section-title">Datos Generales</th>
+        </tr>
+        <tr>
+          <th>No. de imagen IR</th>
+          <td data-editable="true">IR_00541</td>
+          <th>No. Imagen Visual</th>
+          <td data-editable="true">20221004_113125</td>
+          <th>Humedad Rel.</th>
+          <td data-editable="true">50%</td>
+        </tr>
+        <tr>
+          <th>Distancia</th>
+          <td data-editable="true">0.50m</td>
+          <th>Veloc. Viento</th>
+          <td data-editable="true">N/A</td>
+          <th>Amperaje</th>
+          <td data-editable="true">24</td>
+        </tr>
+        <tr>
+          <th colspan="6" class="table-section-title">Medición</th>
+        </tr>
+        <tr>
+          <th>Temp. Máx.</th>
+          <td data-editable="true">115.08 °C (239.15°F)</td>
+          <th>Temp. Ref.</th>
+          <td data-editable="true">N/A</td>
+          <th>ΔT=</th>
+          <td data-editable="true">N/A</td>
+        </tr>
+        <tr>
+          <th>Emisividad</th>
+          <td data-editable="true">0.95</td>
+          <td colspan="4"></td>
+        </tr>
+        <tr>
+          <th>Componente</th>
+          <td class="component-field" data-editable="true">Equipo XYZ</td>
+          <th>Estado</th>
+          <td class="estado-field" data-editable="true">Operativo</td>
+          <th>Criticidad</th>
+          <td class="criticidad-field" data-editable="true">A</td>
+        </tr>
+      </tbody>
+    `;
+    
+    // Bloque de Condición
+    const condLabel = document.createElement("div");
+    condLabel.classList.add("condicion-label");
+    condLabel.textContent = "Condición";
+    const condText = document.createElement("div");
+    condText.classList.add("condicion-text");
+    condText.setAttribute("data-editable", "true");
+    condText.textContent = "Se detecta anomalía térmica...";
+    
+    wrapper.append(removeBtn, secTitle, imageGrid, thermoTable, condLabel, condText);
+    document.getElementById("sectionsContainer").appendChild(wrapper);
+    
+    setTimeout(() => {
+      wrapper.style.opacity = "1";
+    }, 50);
+  }
+  
+  /************************************************************
+   * 3) Modo Edición (Básico y Avanzado)
+   ************************************************************/
+  function toggleEditingMode(checkbox) {
+    const isEditing = checkbox.checked;
+    document.querySelectorAll('[data-editable="true"]').forEach(el => {
+      el.contentEditable = isEditing;
+    });
+  }
+  function toggleAdvancedEditing(checkbox) {
+    const advanced = checkbox.checked;
+    document.querySelectorAll('.summary-table th, .table-section-title').forEach(el => {
+      el.contentEditable = advanced;
+      el.style.border = advanced ? "1px dashed #000" : "";
+    });
+  }
+  function toggleRounding(checkbox) {
+    const rounding = checkbox.checked;
+    document.querySelectorAll('.label-red, .inspection-table th, .section-title').forEach(el => {
+      el.style.borderRadius = rounding ? '10px' : '0';
+    });
+  }
+  
+  /************************************************************
+   * 4) Temas de Encabezado y Temas Generales
+   ************************************************************/
+  function applyHeadingTheme() {
+    const font = document.getElementById('headingFontSelect').value;
+    const fontSize = document.getElementById('headingFontSize').value;
+    const color = document.getElementById('headingColorPicker').value;
+    const scope = document.querySelector('input[name="headingScope"]:checked').value;
+    if (scope === "todo") {
+      document.querySelectorAll('.summary-table th, .table-section-title, .removeSectionBtn').forEach(el => {
+        el.style.fontFamily = font;
+        el.style.fontSize = fontSize + "px";
+        el.style.color = color;
+      });
+    } else {
+      const selection = window.getSelection();
+      if (selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        const span = document.createElement('span');
+        span.style.fontFamily = font;
+        span.style.fontSize = fontSize + "px";
+        span.style.color = color;
+        range.surroundContents(span);
+      }
+    }
+  }
+  function applyGeneralTheme() {
+    const generalFont = document.getElementById('generalFontSelect').value;
+    const generalFontSize = document.getElementById('generalFontSize').value;
+    const generalColor = document.getElementById('generalColorPicker').value;
+    const bgColor = document.getElementById('bgColorPicker').value;
+    document.body.style.fontFamily = generalFont;
+    document.body.style.fontSize = generalFontSize + 'px';
+    document.body.style.color = generalColor;
+    document.body.style.backgroundColor = bgColor;
+  }
+  
+  /************************************************************
+   * 5) Logos: Cargar y Eliminar
+   ************************************************************/
+  document.addEventListener('DOMContentLoaded', function() {
+    const leftLogoInput = document.getElementById('leftLogoInput');
+    const rightLogoInput = document.getElementById('rightLogoInput');
+    leftLogoInput.addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = evt => {
+          const img = document.getElementById('logoLeft');
+          img.src = evt.target.result;
+          img.style.display = 'block';
+          adjustLogoSizes();
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+    rightLogoInput.addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = evt => {
+          const img = document.getElementById('logoRight');
+          img.src = evt.target.result;
+          img.style.display = 'block';
+          adjustLogoSizes();
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  });
+  function adjustLogoSizes() {
+    const definedWidth = 150;
+    const definedHeight = 100;
+    const leftImg = document.getElementById('logoLeft');
+    const rightImg = document.getElementById('logoRight');
+    if (leftImg && leftImg.src) {
+      leftImg.style.width = definedWidth + "px";
+      leftImg.style.height = definedHeight + "px";
+    }
+    if (rightImg && rightImg.src) {
+      rightImg.style.width = definedWidth + "px";
+      rightImg.style.height = definedHeight + "px";
+    }
+  }
+  function removeLogo(side) {
+    if (side === 'left') {
+      const img = document.getElementById('logoLeft');
+      img.src = "";
+      img.style.display = 'none';
+    } else if (side === 'right') {
+      const img = document.getElementById('logoRight');
+      img.src = "";
+      img.style.display = 'none';
+    }
+  }
+  
+  /************************************************************
+   * 6) Control de Márgenes, Interlineado, Espacio de Letras
+   ************************************************************/
+  const marginCtrl = document.getElementById('marginControl');
+  const lineHeightCtrl = document.getElementById('lineHeightControl');
+  const letterSpacingCtrl = document.getElementById('letterSpacingControl');
+  marginCtrl.addEventListener('input', () => {
+    document.getElementById('reportContainer').style.margin = marginCtrl.value + "px";
+  });
+  lineHeightCtrl.addEventListener('input', () => {
+    document.getElementById('reportContainer').style.lineHeight = lineHeightCtrl.value;
+  });
+  letterSpacingCtrl.addEventListener('input', () => {
+    document.getElementById('reportContainer').style.letterSpacing = letterSpacingCtrl.value + "px";
+  });
+  
+  /************************************************************
+   * 7) Guardar Configuración Predeterminada y Restablecer
+   ************************************************************/
+  function setDefaults() {
+    alert("Config predeterminada guardada (ejemplo).");
+  }
+  function resetDocument() {
+    if (confirm("¿Deseas restablecer el reporte a su versión base?")) {
+      location.reload();
+    }
+  }
+  
+  /************************************************************
+   * 8) Exportar PDF, Exportar Imagen
+   ************************************************************/
+  document.getElementById("exportPdfBtn").addEventListener("click", () => {
+    window.print();
+  });
+  document.getElementById("exportImageBtn").addEventListener("click", () => {
+    html2canvas(document.getElementById("reportContainer")).then(canvas => {
+      const imgData = canvas.toDataURL("image/png");
+      const link = document.createElement("a");
+      link.href = imgData;
+      link.download = "InformeTermografico.png";
+      link.click();
+    });
+  });
+  
+  /************************************************************
+   * 9) Guardar en Archivo / Cargar desde Archivo
+   ************************************************************/
+  document.getElementById("saveFileBtn").addEventListener("click", guardarEnArchivo);
+  document.getElementById("loadFileBtn").addEventListener("click", cargarDesdeArchivo);
+  
+  async function guardarEnArchivo() {
+    try {
+      const content = document.getElementById("reportContainer").innerHTML;
+      const blob = new Blob([content], { type: "text/html" });
+      if (window.showSaveFilePicker) {
+        const opciones = {
+          types: [{
+            description: "Archivos HTML",
+            accept: { "text/html": [".html", ".htm"] }
+          }]
+        };
+        const handle = await window.showSaveFilePicker(opciones);
+        const writable = await handle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+      } else {
+        // Fallback: descarga el archivo
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "ReporteTermografico.html";
+        a.click();
+        URL.revokeObjectURL(a.href);
+      }
+      alert("Datos guardados en el archivo seleccionado.");
+    } catch (err) {
+      console.error("Error al guardar en archivo:", err);
+      alert("Error al guardar el archivo.");
+    }
+  }
+  
+  async function cargarDesdeArchivo() {
+    try {
+      const opciones = {
+        types: [{
+          description: "Archivos HTML",
+          accept: { "text/html": [".html", ".htm"] }
+        }]
+      };
+      let handle;
+      if (window.showOpenFilePicker) {
+        [handle] = await window.showOpenFilePicker(opciones);
+      } else {
+        // Fallback: usar un input file manual
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = ".html,.htm";
+        input.onchange = e => {
+          const file = e.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = ev => {
+            document.getElementById("reportContainer").innerHTML = ev.target.result;
+          };
+          reader.readAsText(file);
+        };
+        input.click();
+        return;
+      }
+      const file = await handle.getFile();
+      const contents = await file.text();
+      document.getElementById("reportContainer").innerHTML = contents;
+      alert("Datos cargados correctamente desde el archivo.");
+    } catch (err) {
+      console.error("Error al cargar desde archivo:", err);
+      alert("Error al cargar el archivo.");
+    }
+  }
+  
+  /************************************************************
+   * FUNCIONES ADICIONALES PARA LA TABLA, FIRMA Y GRÁFICO
+   ************************************************************/
+  function addHeaderRow() {
+    const table = document.getElementById('headerTable');
+    const newRow = table.insertRow();
+    let cell1 = newRow.insertCell(0);
+    cell1.classList.add('label-red');
+    cell1.innerHTML = `<input type="checkbox" class="header-select" /> Nuevo Campo`;
+    let cell2 = newRow.insertCell(1);
+    cell2.classList.add('white-field');
+    cell2.innerHTML = `<input type="text" placeholder="Valor...">`;
+    let cell3 = newRow.insertCell(2);
+    cell3.classList.add('label-red');
+    cell3.innerHTML = `<input type="checkbox" class="header-select" /> Otro Campo`;
+    let cell4 = newRow.insertCell(3);
+    cell4.classList.add('white-field');
+    cell4.innerHTML = `<input type="text" placeholder="Valor...">`;
+  }
+
+  function removeSelectedHeaderRows() {
+    const table = document.getElementById('headerTable');
+    const checkboxes = table.querySelectorAll('.header-select:checked');
+    checkboxes.forEach(checkbox => {
+      const row = checkbox.parentNode.parentNode;
+      row.remove();
+    });
+  }
+
+  function addRow() {
+    const tableBody = document.getElementById('inspectionTable').querySelector('tbody');
+    const newRow = tableBody.insertRow();
+    let cell0 = newRow.insertCell(0);
+    cell0.classList.add('sel-column');
+    cell0.innerHTML = '<input type="checkbox" name="rowSelector">';
+    let cell1 = newRow.insertCell(1);
+    cell1.innerHTML = '<input type="text" name="equipo[]">';
+    let cell2 = newRow.insertCell(2);
+    cell2.innerHTML = '<input type="month" name="mesInspeccion[]">';
+    let cell3 = newRow.insertCell(3);
+    cell3.innerHTML = '<input type="text" name="ubicacion[]">';
+    let cell4 = newRow.insertCell(4);
+    cell4.innerHTML = '<input type="text" name="estado[]" placeholder="B / A / C" oninput="updateEstadoColor(this)">';
+    let cell5 = newRow.insertCell(5);
+    cell5.innerHTML = '<input type="text" name="acciones[]" placeholder="Acciones...">';
+    updateChart();
+  }
+
+  function removeSelectedRows() {
+    const table = document.getElementById('inspectionTable');
+    const checkboxes = table.querySelectorAll('tbody input[name="rowSelector"]:checked');
+    checkboxes.forEach(checkbox => {
+      const row = checkbox.closest('tr');
+      row.remove();
+    });
+    updateChart();
+  }
+
+  function duplicateSelectedRows() {
+    const table = document.getElementById('inspectionTable');
+    const tableBody = table.querySelector('tbody');
+    const checkboxes = table.querySelectorAll('tbody input[name="rowSelector"]:checked');
+    let rowsToDuplicate = [];
+    checkboxes.forEach(checkbox => {
+      rowsToDuplicate.push(checkbox.closest('tr'));
+    });
+    rowsToDuplicate.forEach(row => {
+      let newRow = row.cloneNode(true);
+      newRow.querySelector('input[name="rowSelector"]').checked = false;
+      tableBody.insertBefore(newRow, row.nextSibling);
+      let estadoInput = newRow.querySelector('input[name="estado[]"]');
+      if (estadoInput) {
+        estadoInput.oninput = function() { updateEstadoColor(estadoInput); };
+      }
+    });
+    updateChart();
+  }
+
+  function importCSV() {
+    const fileInput = document.getElementById('fileInput');
+    const file = fileInput.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const text = e.target.result;
+      const lines = text.split(/\r?\n/);
+      lines.forEach(line => {
+        const equipoName = line.trim();
+        if (equipoName) {
+          const tableBody = document.getElementById('inspectionTable').querySelector('tbody');
+          const newRow = tableBody.insertRow();
+          let cell0 = newRow.insertCell(0);
+          cell0.classList.add('sel-column');
+          cell0.innerHTML = '<input type="checkbox" name="rowSelector">';
+          let cell1 = newRow.insertCell(1);
+          cell1.innerHTML = `<input type="text" name="equipo[]" value="${equipoName}">`;
+          let cell2 = newRow.insertCell(2);
+          cell2.innerHTML = '<input type="month" name="mesInspeccion[]">';
+          let cell3 = newRow.insertCell(3);
+          cell3.innerHTML = '<input type="text" name="ubicacion[]">';
+          let cell4 = newRow.insertCell(4);
+          cell4.innerHTML = '<input type="text" name="estado[]" placeholder="B / A / C" oninput="updateEstadoColor(this)">';
+          let cell5 = newRow.insertCell(5);
+          cell5.innerHTML = '<input type="text" name="acciones[]" placeholder="Acciones...">';
+        }
+      });
+      updateChart();
+    };
+    reader.readAsText(file);
+  }
+
+  function updateEstadoColor(input) {
+    const val = input.value.trim().toLowerCase();
+    if (val === 'b') {
+      input.style.backgroundColor = 'green';
+      input.style.color = 'green';
+      input.style.border = "";
+    } else if (val === 'a') {
+      input.style.backgroundColor = 'yellow';
+      input.style.color = 'yellow';
+      input.style.border = "";
+    } else if (val === 'c') {
+      input.style.backgroundColor = '#d60000';
+      input.style.color = '#d60000';
+      input.style.border = "";
+    } else {
+      input.style.backgroundColor = '';
+      input.style.color = '';
+      input.style.border = "";
+    }
+    updateChart();
+  }
+
+  /*********************************************************
+   * GRÁFICO (Chart.js)
+   *********************************************************/
+  let chart = null;
+  function initializeChart() {
+    const ctx = document.getElementById('statusChart').getContext('2d');
+    chart = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: ['Bueno', 'Alerta', 'Crítico'],
+        datasets: [{
+          data: [0, 0, 0],
+          backgroundColor: ['green', 'yellow', '#d60000'],
+          borderColor: ['#fff','#fff','#fff'],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          tooltip: { enabled: false },
+          legend: {
+            position: 'bottom',
+            labels: {
+              generateLabels: function(chart) {
+                const data = chart.data;
+                if (data.labels.length && data.datasets.length) {
+                  const dataset = data.datasets[0];
+                  return data.labels.map((label, i) => {
+                    const value = dataset.data[i];
+                    const color = dataset.backgroundColor[i];
+                    return { text: label + ': ' + value, fillStyle: color, hidden: isNaN(value) || value === null };
+                  });
+                }
+                return [];
+              }
+            }
+          },
+          title: { display: true, text: 'Resumen de Estados de Equipos' },
+          datalabels: {
+            formatter: (value) => value,
+            color: '#fff',
+            font: { weight: 'bold' }
+          }
+        }
+      }
+    });
+    updateChart();
+  }
+
+  function updateChart() {
+    if (!chart) return;
+    let countBueno = 0, countAlerta = 0, countCritico = 0;
+    document.querySelectorAll('input[name="estado[]"]').forEach(input => {
+      const val = input.value.trim().toLowerCase();
+      if (val === 'b') countBueno++;
+      else if (val === 'a') countAlerta++;
+      else if (val === 'c') countCritico++;
+    });
+    chart.data.datasets[0].data = [countBueno, countAlerta, countCritico];
+    chart.update();
+  }
+
+  /*********************************************************
+   * FIRMA DIGITAL
+   *********************************************************/
+  function clearSignature(){
+    const canvas = document.getElementById('signatureCanvas');
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+  function clearSecondSignature(){
+    const canvas2 = document.getElementById('signatureCanvas2');
+    const ctx2 = canvas2.getContext('2d');
+    ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
+  }
+
+  /*********************************************************
+   * GUARDAR E IMPRIMIR REPORTE (HTML completo)
+   *********************************************************/
+  function saveReport() {
+    const content = document.documentElement.outerHTML;
+    const blob = new Blob([content], { type: "text/html" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "reporte.html";
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); }, 100);
+  }
+  
+  function printReport() {
+    window.print();
+  }
+  
+  /*********************************************************
+   * OPCIONES DE ALMACENAMIENTO (Guardar/Cargar desde Archivo - JSON)
+   *********************************************************/
+  async function guardarEnArchivo() {
+    try {
+      // Recopilamos algunos datos del reporte
+      const data = {
+        headerTable: document.getElementById("headerTable").innerHTML,
+        inspectionTable: document.getElementById("inspectionTable").innerHTML,
+        generalTheme: {
+          fontFamily: document.body.style.fontFamily,
+          fontSize: document.body.style.fontSize,
+          color: document.body.style.color,
+          backgroundColor: document.body.style.backgroundColor
+        }
+      };
+      const jsonData = JSON.stringify(data);
+      const blob = new Blob([jsonData], { type: "application/json" });
+      if (window.showSaveFilePicker) {
+        const opciones = {
+          types: [{
+            description: "Archivos JSON",
+            accept: { "application/json": [".json"] }
+          }]
+        };
+        const handle = await window.showSaveFilePicker(opciones);
+        const writable = await handle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+      } else {
+        // Fallback: descarga el archivo
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "reporte.json";
+        a.click();
+        URL.revokeObjectURL(a.href);
+      }
+      alert("Datos guardados en el archivo seleccionado.");
+    } catch (err) {
+      console.error(err);
+      alert("Error al guardar el archivo.");
+    }
+  }
+
+  async function cargarDesdeArchivo() {
+    try {
+      const opciones = {
+        types: [{
+          description: "Archivos JSON",
+          accept: { "application/json": [".json"] }
+        }]
+      };
+      let handle;
+      if (window.showOpenFilePicker) {
+        [handle] = await window.showOpenFilePicker(opciones);
+      } else {
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = ".json";
+        input.onchange = e => {
+          const file = e.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = ev => {
+            const data = JSON.parse(ev.target.result);
+            document.getElementById("headerTable").innerHTML = data.headerTable;
+            document.getElementById("inspectionTable").innerHTML = data.inspectionTable;
+            document.body.style.fontFamily = data.generalTheme.fontFamily || '';
+            document.body.style.fontSize = data.generalTheme.fontSize || '';
+            document.body.style.color = data.generalTheme.color || '';
+            document.body.style.backgroundColor = data.generalTheme.backgroundColor || '';
+            alert("Datos cargados correctamente desde el archivo.");
+            updateChart();
+          };
+          reader.readAsText(file);
+        };
+        input.click();
+        return;
+      }
+      const file = await handle.getFile();
+      const contents = await file.text();
+      const data = JSON.parse(contents);
+      document.getElementById("headerTable").innerHTML = data.headerTable;
+      document.getElementById("inspectionTable").innerHTML = data.inspectionTable;
+      document.body.style.fontFamily = data.generalTheme.fontFamily || '';
+      document.body.style.fontSize = data.generalTheme.fontSize || '';
+      document.body.style.color = data.generalTheme.color || '';
+      document.body.style.backgroundColor = data.generalTheme.backgroundColor || '';
+      alert("Datos cargados correctamente desde el archivo.");
+      updateChart();
+    } catch (err) {
+      console.error(err);
+      alert("Error al cargar el archivo.");
+    }
+  }
+  
+  /*********************************************************
+   * DOMContentLoaded: Inicializar datepicker, gráfico y cargar configuración predeterminada si existe.
+   *********************************************************/
+  document.addEventListener('DOMContentLoaded', function() {
+    flatpickr(".date-picker", { dateFormat: "d F Y", locale: "es" });
+    initializeChart();
+    let defaultHeader = localStorage.getItem("defaultHeaderTable");
+    if(defaultHeader) {
+      document.getElementById("headerTable").innerHTML = defaultHeader;
+    }
+  });
+  </script>
+</body>
+</html>
