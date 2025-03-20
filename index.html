@@ -581,6 +581,28 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script>
   /************************************************************
+   * Función para actualizar el estilo de una celda de criticidad
+   * según su valor (B: verde, A: amarillo, C: rojo).
+   * Se aplica tanto a la celda de la tabla resumen como a la de la sección.
+   ************************************************************/
+  function updateCriticidadStyle(element) {
+    const value = element.textContent.trim().toUpperCase();
+    if(value === 'B'){
+      element.style.backgroundColor = "green";
+      element.style.color = "green";
+    } else if(value === 'A'){
+      element.style.backgroundColor = "yellow";
+      element.style.color = "yellow";
+    } else if(value === 'C'){
+      element.style.backgroundColor = "red";
+      element.style.color = "red";
+    } else {
+      element.style.backgroundColor = "";
+      element.style.color = "";
+    }
+  }
+  
+  /************************************************************
    * 1) Función para crear un contenedor .image-box
    *    con doble clic para adjuntar imagen y pegar desde portapapeles.
    *    El botón “🗑” restablece la imagen al placeholder sin eliminar el contenedor.
@@ -680,25 +702,8 @@
       const tdCrit = document.createElement('td');
       tdCrit.classList.add('critCell');
       tdCrit.textContent = criticidad;
-      
-      // Cambiar color según el valor de criticidad
-      switch(criticidad.trim().toUpperCase()){
-        case 'B': // Verde
-          tdCrit.style.backgroundColor = "green";
-          tdCrit.style.color = "green";
-          break;
-        case 'A': // Amarillo
-          tdCrit.style.backgroundColor = "yellow";
-          tdCrit.style.color = "yellow";
-          break;
-        case 'C': // Rojo
-          tdCrit.style.backgroundColor = "red";
-          tdCrit.style.color = "red";
-          break;
-        default:
-          tdCrit.style.backgroundColor = "";
-          tdCrit.style.color = "";
-      }
+      // Actualizar estilo de la celda de criticidad en la tabla resumen
+      updateCriticidadStyle(tdCrit);
       
       tr.append(tdCounter, tdComp, tdEstado, tdCrit);
       summaryTableBody.appendChild(tr);
@@ -710,6 +715,7 @@
    *    Al finalizar la creación, se actualiza la tabla resumen.
    *    Además, se agregan event listeners para actualizar la tabla
    *    cuando se editen los campos "Componente", "Estado" y "Criticidad".
+   *    Se asegura también de que los nuevos elementos sean editables si el modo edición está activo.
    ************************************************************/
   let sectionCounter = 0;
   document.getElementById("addTermografiaSectionBtn").addEventListener("click", () => {
@@ -829,7 +835,20 @@
     const criticidadField = wrapper.querySelector('.criticidad-field');
     if (componentField) componentField.addEventListener("input", updateSummaryTable);
     if (estadoField) estadoField.addEventListener("input", updateSummaryTable);
-    if (criticidadField) criticidadField.addEventListener("input", updateSummaryTable);
+    if (criticidadField) {
+      criticidadField.addEventListener("input", () => {
+        updateCriticidadStyle(criticidadField);
+        updateSummaryTable();
+      });
+      updateCriticidadStyle(criticidadField);
+    }
+    
+    // Si el modo edición está activo, asegurarse de que los nuevos elementos sean editables
+    if (document.getElementById("editModeCheckbox").checked) {
+      wrapper.querySelectorAll('[data-editable="true"]').forEach(el => {
+        el.contentEditable = true;
+      });
+    }
     
     // Actualiza la tabla resumen tras agregar la nueva sección
     updateSummaryTable();
@@ -1087,4 +1106,3 @@
   </script>
 </body>
 </html>
-
